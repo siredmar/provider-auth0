@@ -3,19 +3,19 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.14.0
-  name: resources.null.auth0.upbound.io
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: grants.client.crossplane.io
 spec:
-  group: null.auth0.upbound.io
+  group: client.crossplane.io
   names:
     categories:
     - crossplane
     - managed
     - auth0
-    kind: Resource
-    listKind: ResourceList
-    plural: resources
-    singular: resource
+    kind: Grant
+    listKind: GrantList
+    plural: grants
+    singular: grant
   scope: Cluster
   versions:
   - additionalPrinterColumns:
@@ -34,10 +34,12 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Resource is the Schema for the Resources API. The null_resource
-          resource implements the standard resource lifecycle but takes no further
-          action.hashicorp. The triggers argument allows specifying an arbitrary set
-          of values that, when changed, will cause the resource to be replaced.
+        description: Grant is the Schema for the Grants API. Auth0 uses various grant
+          types, or methods by which you grant limited access to your resources to
+          another entity without exposing credentials. The OAuth 2.0 protocol supports
+          several types of grants, which allow different types of access. This resource
+          allows you to create and manage client grants used with configured Auth0
+          clients.
         properties:
           apiVersion:
             description: |-
@@ -57,7 +59,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: ResourceSpec defines the desired state of Resource
+            description: GrantSpec defines the desired state of Grant
             properties:
               deletionPolicy:
                 default: Delete
@@ -75,14 +77,33 @@ spec:
                 type: string
               forProvider:
                 properties:
-                  triggers:
-                    additionalProperties:
-                      type: string
+                  allowAnyOrganization:
                     description: |-
-                      running any associated provisioners.
-                      A map of arbitrary strings that, when changed, will force the null resource to be replaced, re-running any associated provisioners.
-                    type: object
-                    x-kubernetes-map-type: granular
+                      (Boolean) If enabled, any organization can be used with this grant. If disabled (default), the grant must be explicitly assigned to the desired organizations.
+                      If enabled, any organization can be used with this grant. If disabled (default), the grant must be explicitly assigned to the desired organizations.
+                    type: boolean
+                  audience:
+                    description: |-
+                      (String) Audience or API Identifier for this grant.
+                      Audience or API Identifier for this grant.
+                    type: string
+                  clientId:
+                    description: |-
+                      (String) ID of the client for this grant.
+                      ID of the client for this grant.
+                    type: string
+                  organizationUsage:
+                    description: |-
+                      (String) Defines whether organizations can be used with client credentials exchanges for this grant. (defaults to deny when not defined)
+                      Defines whether organizations can be used with client credentials exchanges for this grant. (defaults to deny when not defined)
+                    type: string
+                  scopes:
+                    description: |-
+                      (List of String) Permissions (scopes) included in this grant.
+                      Permissions (scopes) included in this grant.
+                    items:
+                      type: string
+                    type: array
                 type: object
               initProvider:
                 description: |-
@@ -97,14 +118,33 @@ spec:
                   for example because of an external controller is managing them, like an
                   autoscaler.
                 properties:
-                  triggers:
-                    additionalProperties:
-                      type: string
+                  allowAnyOrganization:
                     description: |-
-                      running any associated provisioners.
-                      A map of arbitrary strings that, when changed, will force the null resource to be replaced, re-running any associated provisioners.
-                    type: object
-                    x-kubernetes-map-type: granular
+                      (Boolean) If enabled, any organization can be used with this grant. If disabled (default), the grant must be explicitly assigned to the desired organizations.
+                      If enabled, any organization can be used with this grant. If disabled (default), the grant must be explicitly assigned to the desired organizations.
+                    type: boolean
+                  audience:
+                    description: |-
+                      (String) Audience or API Identifier for this grant.
+                      Audience or API Identifier for this grant.
+                    type: string
+                  clientId:
+                    description: |-
+                      (String) ID of the client for this grant.
+                      ID of the client for this grant.
+                    type: string
+                  organizationUsage:
+                    description: |-
+                      (String) Defines whether organizations can be used with client credentials exchanges for this grant. (defaults to deny when not defined)
+                      Defines whether organizations can be used with client credentials exchanges for this grant. (defaults to deny when not defined)
+                    type: string
+                  scopes:
+                    description: |-
+                      (List of String) Permissions (scopes) included in this grant.
+                      Permissions (scopes) included in this grant.
+                    items:
+                      type: string
+                    type: array
                 type: object
               managementPolicies:
                 default:
@@ -172,93 +212,12 @@ spec:
                 required:
                 - name
                 type: object
-              publishConnectionDetailsTo:
-                description: |-
-                  PublishConnectionDetailsTo specifies the connection secret config which
-                  contains a name, metadata and a reference to secret store config to
-                  which any connection details for this managed resource should be written.
-                  Connection details frequently include the endpoint, username,
-                  and password required to connect to the managed resource.
-                properties:
-                  configRef:
-                    default:
-                      name: default
-                    description: |-
-                      SecretStoreConfigRef specifies which secret store config should be used
-                      for this ConnectionSecret.
-                    properties:
-                      name:
-                        description: Name of the referenced object.
-                        type: string
-                      policy:
-                        description: Policies for referencing.
-                        properties:
-                          resolution:
-                            default: Required
-                            description: |-
-                              Resolution specifies whether resolution of this reference is required.
-                              The default is 'Required', which means the reconcile will fail if the
-                              reference cannot be resolved. 'Optional' means this reference will be
-                              a no-op if it cannot be resolved.
-                            enum:
-                            - Required
-                            - Optional
-                            type: string
-                          resolve:
-                            description: |-
-                              Resolve specifies when this reference should be resolved. The default
-                              is 'IfNotPresent', which will attempt to resolve the reference only when
-                              the corresponding field is not present. Use 'Always' to resolve the
-                              reference on every reconcile.
-                            enum:
-                            - Always
-                            - IfNotPresent
-                            type: string
-                        type: object
-                    required:
-                    - name
-                    type: object
-                  metadata:
-                    description: Metadata is the metadata for connection secret.
-                    properties:
-                      annotations:
-                        additionalProperties:
-                          type: string
-                        description: |-
-                          Annotations are the annotations to be added to connection secret.
-                          - For Kubernetes secrets, this will be used as "metadata.annotations".
-                          - It is up to Secret Store implementation for others store types.
-                        type: object
-                      labels:
-                        additionalProperties:
-                          type: string
-                        description: |-
-                          Labels are the labels/tags to be added to connection secret.
-                          - For Kubernetes secrets, this will be used as "metadata.labels".
-                          - It is up to Secret Store implementation for others store types.
-                        type: object
-                      type:
-                        description: |-
-                          Type is the SecretType for the connection secret.
-                          - Only valid for Kubernetes Secret Stores.
-                        type: string
-                    type: object
-                  name:
-                    description: Name is the name of the connection secret.
-                    type: string
-                required:
-                - name
-                type: object
               writeConnectionSecretToRef:
                 description: |-
                   WriteConnectionSecretToReference specifies the namespace and name of a
                   Secret to which any connection details for this managed resource should
                   be written. Connection details frequently include the endpoint, username,
                   and password required to connect to the managed resource.
-                  This field is planned to be replaced in a future release in favor of
-                  PublishConnectionDetailsTo. Currently, both could be set independently
-                  and connection details would be published to both without affecting
-                  each other.
                 properties:
                   name:
                     description: Name of the secret.
@@ -273,23 +232,54 @@ spec:
             required:
             - forProvider
             type: object
+            x-kubernetes-validations:
+            - message: spec.forProvider.audience is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.audience)
+                || (has(self.initProvider) && has(self.initProvider.audience))'
+            - message: spec.forProvider.clientId is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.clientId)
+                || (has(self.initProvider) && has(self.initProvider.clientId))'
+            - message: spec.forProvider.scopes is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.scopes)
+                || (has(self.initProvider) && has(self.initProvider.scopes))'
           status:
-            description: ResourceStatus defines the observed state of Resource.
+            description: GrantStatus defines the observed state of Grant.
             properties:
               atProvider:
                 properties:
-                  id:
-                    description: (String) This is set to a random value at create
-                      time.
-                    type: string
-                  triggers:
-                    additionalProperties:
-                      type: string
+                  allowAnyOrganization:
                     description: |-
-                      running any associated provisioners.
-                      A map of arbitrary strings that, when changed, will force the null resource to be replaced, re-running any associated provisioners.
-                    type: object
-                    x-kubernetes-map-type: granular
+                      (Boolean) If enabled, any organization can be used with this grant. If disabled (default), the grant must be explicitly assigned to the desired organizations.
+                      If enabled, any organization can be used with this grant. If disabled (default), the grant must be explicitly assigned to the desired organizations.
+                    type: boolean
+                  audience:
+                    description: |-
+                      (String) Audience or API Identifier for this grant.
+                      Audience or API Identifier for this grant.
+                    type: string
+                  clientId:
+                    description: |-
+                      (String) ID of the client for this grant.
+                      ID of the client for this grant.
+                    type: string
+                  id:
+                    description: (String) The ID of this resource.
+                    type: string
+                  organizationUsage:
+                    description: |-
+                      (String) Defines whether organizations can be used with client credentials exchanges for this grant. (defaults to deny when not defined)
+                      Defines whether organizations can be used with client credentials exchanges for this grant. (defaults to deny when not defined)
+                    type: string
+                  scopes:
+                    description: |-
+                      (List of String) Permissions (scopes) included in this grant.
+                      Permissions (scopes) included in this grant.
+                    items:
+                      type: string
+                    type: array
                 type: object
               conditions:
                 description: Conditions of the resource.

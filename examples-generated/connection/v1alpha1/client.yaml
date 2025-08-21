@@ -1,0 +1,25 @@
+apiVersion: connection.crossplane.io/v1alpha1
+kind: Client
+metadata:
+  annotations:
+    meta.upbound.io/example-id: connection/v1alpha1/client
+  labels:
+    testing.upbound.io/example-name: my_conn_client_assoc
+  name: my-conn-client-assoc
+spec:
+  forProvider:
+    clientId: ${auth0_client.my_client.id}
+    connectionId: ${auth0_connection.my_conn.id}
+
+---
+
+apiVersion: client.crossplane.io/v1alpha1
+kind: Client
+metadata:
+  annotations:
+    meta.upbound.io/example-id: connection/v1alpha1/client
+  labels:
+    testing.upbound.io/example-name: my_client
+  name: my-client
+spec:
+  forProvider: {}

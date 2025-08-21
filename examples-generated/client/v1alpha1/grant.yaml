@@ -1,0 +1,28 @@
+apiVersion: client.crossplane.io/v1alpha1
+kind: Grant
+metadata:
+  annotations:
+    meta.upbound.io/example-id: client/v1alpha1/grant
+  labels:
+    testing.upbound.io/example-name: my_client_grant
+  name: my-client-grant
+spec:
+  forProvider:
+    audience: ${auth0_resource_server.my_resource_server.identifier}
+    clientId: ${auth0_client.my_client.id}
+    scopes:
+    - create:foo
+    - create:bar
+
+---
+
+apiVersion: client.crossplane.io/v1alpha1
+kind: Client
+metadata:
+  annotations:
+    meta.upbound.io/example-id: client/v1alpha1/grant
+  labels:
+    testing.upbound.io/example-name: my_client
+  name: my-client
+spec:
+  forProvider: {}

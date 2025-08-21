@@ -7,9 +7,11 @@ package controller
 import (
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	"github.com/crossplane/upjet/pkg/controller"
+	"github.com/crossplane/upjet/v2/pkg/controller"
 
-	resource "github.com/siredmar/provider-auth0/internal/controller/null/resource"
+	client "github.com/siredmar/provider-auth0/internal/controller/client/client"
+	grant "github.com/siredmar/provider-auth0/internal/controller/client/grant"
+	clientconnection "github.com/siredmar/provider-auth0/internal/controller/connection/client"
 	providerconfig "github.com/siredmar/provider-auth0/internal/controller/providerconfig"
 )
 
@@ -17,8 +19,26 @@ import (
 // the supplied manager.
 func Setup(mgr ctrl.Manager, o controller.Options) error {
 	for _, setup := range []func(ctrl.Manager, controller.Options) error{
-		resource.Setup,
+		client.Setup,
+		grant.Setup,
+		clientconnection.Setup,
 		providerconfig.Setup,
+	} {
+		if err := setup(mgr, o); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// SetupGated creates all controllers with the supplied logger and adds them to
+// the supplied manager gated.
+func SetupGated(mgr ctrl.Manager, o controller.Options) error {
+	for _, setup := range []func(ctrl.Manager, controller.Options) error{
+		client.SetupGated,
+		grant.SetupGated,
+		clientconnection.SetupGated,
+		providerconfig.SetupGated,
 	} {
 		if err := setup(mgr, o); err != nil {
 			return err
