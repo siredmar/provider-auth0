@@ -1,4 +1,4 @@
-module github.com/upbound/upjet-provider-template
+module github.com/siredmar/provider-auth0
 
 go 1.21
 

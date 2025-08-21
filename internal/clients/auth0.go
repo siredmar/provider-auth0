@@ -15,7 +15,7 @@ import (
 
 	"github.com/crossplane/upjet/pkg/terraform"
 
-	"github.com/upbound/upjet-provider-template/apis/v1beta1"
+	"github.com/siredmar/provider-auth0/apis/v1beta1"
 )
 
 const (
@@ -24,7 +24,11 @@ const (
 	errGetProviderConfig    = "cannot get referenced ProviderConfig"
 	errTrackUsage           = "cannot track ProviderConfig usage"
 	errExtractCredentials   = "cannot extract credentials"
-	errUnmarshalCredentials = "cannot unmarshal template credentials as JSON"
+	errUnmarshalCredentials = "cannot unmarshal auth0 credentials as JSON"
+	keyClientID             = "client_id"
+	keyClientSecret         = "client_secret"
+	keyDomain               = "domain"
+	keyAudience             = "audience"
 )
 
 // TerraformSetupBuilder builds Terraform a terraform.SetupFn function which
@@ -63,10 +67,19 @@ func TerraformSetupBuilder(version, providerSource, providerVersion string) terr
 		}
 
 		// Set credentials in Terraform provider configuration.
-		/*ps.Configuration = map[string]any{
-			"username": creds["username"],
-			"password": creds["password"],
-		}*/
+		ps.Configuration = map[string]any{}
+		if v, ok := creds[keyClientID]; ok {
+			ps.Configuration[keyClientID] = v
+		}
+		if v, ok := creds[keyClientSecret]; ok {
+			ps.Configuration[keyClientSecret] = v
+		}
+		if v, ok := creds[keyDomain]; ok {
+			ps.Configuration[keyDomain] = v
+		}
+		if v, ok := creds[keyAudience]; ok {
+			ps.Configuration[keyAudience] = v
+		}
 		return ps, nil
 	}
 }

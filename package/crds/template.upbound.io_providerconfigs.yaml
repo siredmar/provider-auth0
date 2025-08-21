@@ -4,14 +4,14 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: providerconfigs.template.upbound.io
+  name: providerconfigs.auth0.upbound.io
 spec:
-  group: template.upbound.io
+  group: auth0.upbound.io
   names:
     categories:
     - crossplane
     - provider
-    - template
+    - auth0
     kind: ProviderConfig
     listKind: ProviderConfigList
     plural: providerconfigs
@@ -29,7 +29,7 @@ spec:
     name: v1beta1
     schema:
       openAPIV3Schema:
-        description: A ProviderConfig configures a Template provider.
+        description: A ProviderConfig configures a Auth0 provider.
         properties:
           apiVersion:
             description: |-
