@@ -1871,6 +1871,7 @@ resources:
                 }
               references:
                 connection_id: auth0_connection.my_conn.id
+                enabled_clients: auth0_client.my_first_client.id
               dependencies:
                 auth0_client.my_first_client: |-
                     {
@@ -3284,6 +3285,7 @@ resources:
                 }
               references:
                 organization_id: auth0_organization.my_org.id
+                roles: auth0_role.reader.id
                 user_id: auth0_user.user.id
               dependencies:
                 auth0_organization.my_org: |-
@@ -3339,6 +3341,7 @@ resources:
                   "organization_id": "${auth0_organization.my_org.id}"
                 }
               references:
+                members: auth0_user.user_1.id
                 organization_id: auth0_organization.my_org.id
               dependencies:
                 auth0_organization.my_org: |-
@@ -4752,6 +4755,7 @@ resources:
                   "user_id": "${auth0_user.user.id}"
                 }
               references:
+                roles: auth0_role.admin.id
                 user_id: auth0_user.user.id
               dependencies:
                 auth0_role.admin: |-
