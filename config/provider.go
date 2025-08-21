@@ -10,7 +10,9 @@ import (
 
 	ujconfig "github.com/crossplane/upjet/pkg/config"
 
-	"github.com/siredmar/provider-auth0/config/null"
+	"github.com/siredmar/provider-auth0/config/client"
+	"github.com/siredmar/provider-auth0/config/client_connection"
+	"github.com/siredmar/provider-auth0/config/client_connection_grant"
 )
 
 const (
@@ -36,7 +38,9 @@ func GetProvider() *ujconfig.Provider {
 
 	for _, configure := range []func(provider *ujconfig.Provider){
 		// add custom config functions
-		null.Configure,
+		client.Configure,
+		client_connection.Configure,
+		client_connection_grant.Configure,
 	} {
 		configure(pc)
 	}
